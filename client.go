@@ -9,7 +9,7 @@ import (
 )
 
 func SendFile(conn net.Conn) {
-	fileName := "C:\\Robert\\日志分析\\tools_go\\vdn_sqlInterface\\a.txt"
+	fileName := "./a.txt"
 	file, err := os.OpenFile(fileName, os.O_RDWR, 0666)
 	if err != nil {
 		fmt.Println("Open file error!", err)
@@ -30,23 +30,29 @@ func SendFile(conn net.Conn) {
 	for {
 		length, err := file.Read(buf)
 		if err != nil {
-		    if err == io.EOF {
-			break
-		    } else {
-			fmt.Println("Read file error!", err)
-			return
-		    }
+			if err == io.EOF {
+				break
+			} else {
+				fmt.Println("Read file error!", err)
+				return
+			}
 		}
 
 		fmt.Println(length, string(buf))
+
+		in, err := conn.Write(buf)
+		if err != nil {
+			fmt.Printf("Send data Error: %d, %v", in, err)
+			os.Exit(0)
+		}
 	}
 }
 
 func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 	var (
-		host   = "127.0.0.1"
-		port   = "9090"
+		host = "127.0.0.1"
+		port = "9090"
 		remote = host + ":" + port
 	)
 
